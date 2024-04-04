@@ -36,26 +36,26 @@ export function createDefaultEvents () {
     createEvent(`${subjects[0]}-${words[0]}`, format(baseDate, 'yyyy-MM-dd'), '23:00', 60)
   ]
 
-  // for (let i = 0; i < 7; i++) {
-  //   for (let s = 0; s < 6; s++) {
-  //     const date =  format(add(baseDate, { days: i }), 'yyyy-MM-dd')
-  //     for (let j = 0; j < 2; j++) {
-  //       events.push(...[
-  //         createEvent(`${subjects[0]}-${words[0]}`, date, `${(9 + s + j)}:00`, 60),
-  //         createEvent(`${subjects[3]}-${words[1]}`, date, `${(9 + s + j)}:00`, 60),
-  //       ])
-  //     }
-  //     for (let j = 0; j < 2; j++) {
-  //       events.push(...[
-  //         createEvent(`${subjects[1]}-${words[2]}`, date, `${(9 + s + j)}:20`, 80),
-  //       ])
-  //     }
-  //     for (let j = 0; j < 2; j++) {
-  //       events.push(...[
-  //         createEvent(`${subjects[2]}-${words[1]}`, date, `${(9 + s + j)}:30`, 90),
-  //       ])
-  //     }
-  //   }
-  // }
+  for (let i = 0; i < 7; i++) {
+    for (let s = 0; s < 6; s++) {
+      const date =  format(add(baseDate, { days: i }), 'yyyy-MM-dd')
+      for (let j = 0; j < 2; j++) {
+        events.push(...[
+          createEvent(`${subjects[0]}-${words[0]}`, date, `${(9 + s + j)}:00`, 60),
+          createEvent(`${subjects[3]}-${words[1]}`, date, `${(9 + s + j)}:00`, 60),
+        ])
+      }
+      for (let j = 0; j < 2; j++) {
+        events.push(...[
+          createEvent(`${subjects[1]}-${words[2]}`, date, `${(9 + s + j)}:20`, 80),
+        ])
+      }
+      for (let j = 0; j < 2; j++) {
+        events.push(...[
+          createEvent(`${subjects[2]}-${words[1]}`, date, `${(9 + s + j)}:30`, 90),
+        ])
+      }
+    }
+  }
   return events
 }
