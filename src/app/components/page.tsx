@@ -1,4 +1,4 @@
-import ViewCalendar from './components/ViewCalendar'
+import ViewCalendar from './ViewCalendar'
 
 export default function Home() {
   return (

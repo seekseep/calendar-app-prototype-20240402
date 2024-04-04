@@ -110,7 +110,13 @@ export function shiftEventToEvents (events: CalendarEvent[], toBeShiftEvent: Cal
 export function createCalendarPack (events: Event[]) {
   const dates: CalendarDate[] = []
 
-  const dateByEvents = events.reduce((acc, event) => {
+  const sortedEvents = events.sort((a, b) => {
+    if (a.start !== b.start) return a.start.localeCompare(b.start)
+    if (a.start === b.start) return a.end.localeCompare(b.end)
+    return a.id.localeCompare(b.id)
+  })
+
+  const dateByEvents = sortedEvents.reduce((acc, event) => {
     const key = format(event.start, 'yyyy-MM-dd')
     const dateEvents = acc[key] || []
     dateEvents.push(event)
