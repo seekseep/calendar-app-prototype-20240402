@@ -1,9 +1,9 @@
 'use client'
 
-import { PropsWithChildren } from "react"
+import { PropsWithChildren } from 'react'
 
 import { Star } from '@mui/icons-material'
-import { AppBar, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material'
 
 const drawerWidth = 200
 
@@ -45,7 +45,7 @@ export default function DashboardLayout ({
                     <ListItemIcon>
                       <Star />
                     </ListItemIcon>
-                    <ListItemText primary={`機能 ${i+1}`} />
+                    <ListItemText primary={`機能 ${i + 1}`} />
                   </ListItemButton>
                 </ListItem>
               ))}

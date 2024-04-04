@@ -1,24 +1,26 @@
-import { Reducer } from "react";
-import { Action, State } from "./types";
-import {Event} from '@/types'
-import { createCalendarPack } from "@/model/calendarPack";
+import { Reducer } from 'react'
+
+import { createCalendarPack } from '@/model/calendarPack'
+import { Event } from '@/types'
+
+import { Action, State } from './types'
 
 export function initializer (events: Event[]): State {
   return {
     minuteUnit: 15,
-    pack: createCalendarPack(events),
-    drag: null
+    pack      : createCalendarPack(events),
+    drag      : null
   }
 }
 
 export const reducer: Reducer<State, Action> = (state, action) => {
   switch (action.type) {
-    case "dragStart":
+    case 'dragStart':
       return {
         ...state,
         drag: action.payload
       }
-    case "drag": {
+    case 'drag': {
       const drag = state.drag
       if (!drag) return state
       return {
@@ -29,22 +31,22 @@ export const reducer: Reducer<State, Action> = (state, action) => {
         }
       }
     }
-    case "dragEnd":
+    case 'dragEnd':
       return {
         ...state,
         drag: null
       }
-    case "setPack":
+    case 'setPack':
       return {
         ...state,
         pack: action.payload
       }
-    case "setMinuteUnit":
+    case 'setMinuteUnit':
       return {
         ...state,
         minuteUnit: action.payload
       }
     default:
-      return state;
+      return state
   }
 }

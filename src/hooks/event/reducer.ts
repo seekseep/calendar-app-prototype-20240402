@@ -1,6 +1,8 @@
-import { Reducer } from "react";
-import { Action, State } from "./types";
+import { Reducer } from 'react'
+
 import { Event } from '@/types'
+
+import { Action, State } from './types'
 
 export function initializer (events: Event[]): State {
   const state: State = {}
@@ -43,6 +45,6 @@ export const reducer: Reducer<State, Action> = (state, action) => {
       return newState
     }
     default:
-      return state;
+      return state
   }
 }

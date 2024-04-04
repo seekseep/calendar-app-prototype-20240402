@@ -1,7 +1,9 @@
-import { Box } from "@mui/material"
-import { PropsWithChildren } from "react"
-import ScrollHelper from "./ScrollHelper"
-import { useCalendar } from "./hooks"
+import { PropsWithChildren } from 'react'
+
+import { Box } from '@mui/material'
+
+import ScrollHelper from './ScrollHelper'
+import { useCalendar } from './hooks'
 
 export default function Container ({ children }: PropsWithChildren) {
   const { refs: { inner: innerRef } } = useCalendar()

@@ -1,3 +1,57 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "plugins": [
+    "@typescript-eslint",
+    "unused-imports"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "semi": ["error", "never"],
+    "key-spacing": ["error", { "align": "colon" }],
+    "space-infix-ops": ["error"],
+    "jsx-quotes": ["error", "prefer-double"],
+    "quotes": ["error", "single"],
+    "object-curly-spacing": ["error", "always"],
+    "no-trailing-spaces": ["error", { "skipBlankLines": true }],
+    "no-multiple-empty-lines": ["error", {
+      "maxBOF": 0,
+      "maxEOF": 0,
+      "max": 1
+    }],
+    "no-use-before-define": "error",
+    "no-undef": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": 1,
+		"unused-imports/no-unused-imports": "error",
+    "@next/next/no-img-element": 0,
+    "no-duplicate-imports": "error",
+    "import/order": ["error", {
+      "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+      "newlines-between": "always",
+      "alphabetize": {
+        "order": "asc"
+      },
+      "pathGroups": [
+        {
+          "pattern": "{react,react-**,next,next/**,yup,formik,date-fns}",
+          "group": "builtin",
+          "position": "before"
+        },
+        {
+          "pattern": "@/[^/]*",
+          "group": "internal",
+          "position": "before"
+        },
+        {
+          "pattern": "{@admin/**,@home/**,@school/**,@teacher/**,@parent/**,@agency/**,@accessLog/**}",
+          "group": "internal",
+          "position": "after"
+        }
+      ],
+      "pathGroupsExcludedImportTypes": ["builtin"]
+    }]
+  }
 }

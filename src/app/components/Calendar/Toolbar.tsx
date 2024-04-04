@@ -1,5 +1,6 @@
-import { Box, Typography, Stack, Select, MenuItem } from "@mui/material";
-import { useCalendar, useTheme } from "./hooks";
+import { Box, Typography, Stack, Select, MenuItem } from '@mui/material'
+
+import { useCalendar, useTheme } from './hooks'
 
 export default function Toolbar () {
   const { state: { minuteUnit }, helpers: { setMinuteUnit } } = useCalendar()
@@ -14,7 +15,7 @@ export default function Toolbar () {
       display="flex"
       alignItems="center"
       zIndex={zIndex.toolbar}
-      borderBottom={`1px solid divider`}
+      borderBottom={'1px solid divider'}
       sx={{
         borderBottomColor: 'divider',
         borderBottomStyle: 'solid',

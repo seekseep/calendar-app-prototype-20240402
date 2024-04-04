@@ -1,6 +1,7 @@
-import { getMinutesFromDate, shiftEventToEvents } from "@/model/calendarPack";
-import { CalendarEvent } from "@/types";
-import { add, set } from "date-fns";
+import { add, set } from 'date-fns'
+
+import { shiftEventToEvents } from '@/model/calendarPack'
+import { CalendarEvent } from '@/types'
 
 export function getRowCount <T extends { row: number }> (events: T[]) {
   return events.reduce((max, event) => Math.max(max, event.row), 0) + 1
@@ -16,7 +17,8 @@ export function appendEventToEvents (
   const [startHours, startMinutes] = time.split(':').map(Number)
   const start = set(date, { hours: startHours, minutes: startMinutes })
 
-  const durationAsMinutes = getMinutesFromDate(event.end) - getMinutesFromDate(event.start)
+  const duration = event.end.getTime() - event.start.getTime()
+  const durationAsMinutes = duration / (1000 * 60)
   const end = add(start, { minutes: durationAsMinutes })
 
   const newEvent = {

@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
-import { CardProps } from "@mui/material";
+import { CardProps } from '@mui/material'
 
 export interface EventCardProps extends CardProps {
   label: ReactNode
@@ -9,4 +9,5 @@ export interface EventCardProps extends CardProps {
   width: number
   height: number
   zIndex: number
+  dragging?: boolean
 }

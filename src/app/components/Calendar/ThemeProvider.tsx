@@ -1,7 +1,8 @@
 'use client'
 
-import { PropsWithChildren } from "react"
-import { ThemeContext, useThemeContextValue } from "./hooks"
+import { PropsWithChildren } from 'react'
+
+import { ThemeContext, useThemeContextValue } from './hooks'
 
 export default function ThemeProvider({ children }: PropsWithChildren) {
   const value = useThemeContextValue()

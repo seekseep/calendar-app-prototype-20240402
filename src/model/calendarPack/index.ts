@@ -1,7 +1,8 @@
-import { CalendarDate, CalendarEvent, Event } from '@/types'
 import { format } from 'date-fns'
 
 import { v4 as uuid } from 'uuid'
+
+import { CalendarDate, CalendarEvent, Event } from '@/types'
 
 type EventsByRow <T> = Record<number, T[]>
 
@@ -18,8 +19,8 @@ export function createCalendarEvents (eventsByRow: EventsByRow<Event>) {
       events.push({
         ...event,
         start: new Date(event.start),
-        end: new Date(event.end),
-        row: row
+        end  : new Date(event.end),
+        row  : row
       })
     }
   }
@@ -27,10 +28,10 @@ export function createCalendarEvents (eventsByRow: EventsByRow<Event>) {
 }
 
 function isOverlapping <T extends { start: Date, end: Date } | { start: string, end: string }> (event1: T, event2: T): boolean {
-  const event1Start = getMinutesFromDate(typeof event1.start === "string" ? new Date(event1.start) : event1.start)
-  const event1End = getMinutesFromDate(typeof event1.end === "string" ? new Date(event1.end) : event1.end)
-  const event2Start = getMinutesFromDate(typeof event2.start === "string" ? new Date(event2.start) : event2.start)
-  const event2End = getMinutesFromDate(typeof event2.end === "string" ? new Date(event2.end) : event2.end)
+  const event1Start = getMinutesFromDate(typeof event1.start === 'string' ? new Date(event1.start) : event1.start)
+  const event1End = getMinutesFromDate(typeof event1.end === 'string' ? new Date(event1.end) : event1.end)
+  const event2Start = getMinutesFromDate(typeof event2.start === 'string' ? new Date(event2.start) : event2.start)
+  const event2End = getMinutesFromDate(typeof event2.end === 'string' ? new Date(event2.end) : event2.end)
   if (event1Start >= event2End || event1End <= event2Start) return false
   return true
 }
@@ -127,8 +128,8 @@ export function createCalendarPack (events: Event[]) {
     const calendareEvents = createCalendarEvents(eventsByRow)
 
     dates.push({
-      id: uuid(),
-      date: new Date(key),
+      id    : uuid(),
+      date  : new Date(key),
       events: calendareEvents
     })
   }

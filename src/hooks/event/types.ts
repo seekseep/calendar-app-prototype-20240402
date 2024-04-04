@@ -17,6 +17,4 @@ export type DeleteAction = {
   payload: string
 }
 
-
-
 export type Action = UpdateAction | BulkUpdate | DeleteAction

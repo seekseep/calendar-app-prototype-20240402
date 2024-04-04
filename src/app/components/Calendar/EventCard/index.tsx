@@ -1,6 +1,8 @@
-import { memo } from 'react';
-import { EventCardProps } from './types';
-import { Card, Typography } from '@mui/material';
+import { memo } from 'react'
+
+import { Card, Typography } from '@mui/material'
+
+import { EventCardProps } from './types'
 
 function EventCard ({
   label,
@@ -9,30 +11,31 @@ function EventCard ({
   width,
   height,
   zIndex,
+  dragging,
   ...props
 }: EventCardProps) {
   return (
     <Card
-      elevation={0}
+      elevation={dragging ? 1 : 0}
+      draggable
       sx={{
-        border: 1,
+        border     : 1,
         borderColor: 'divider',
-        position: 'absolute',
+        position   : 'absolute',
         left, top, width, height,
-        px: 1,
-        display: 'flex',
-        alignItems: 'center',
-        cursor: 'pointer',
-        zIndex
+        px         : 1,
+        display    : 'flex',
+        alignItems : 'center',
+        zIndex     : zIndex + (dragging ? 1 : 0),
       }}
       {...props}>
       <Typography
-        variant='body2'
+        variant="body2"
         whiteSpace="nowrap"
         sx={{
-          userSelect: 'none',
+          userSelect  : 'none',
           textOverflow: 'ellipsis',
-          overflow: 'hidden',
+          overflow    : 'hidden',
         }}>
         {label}
       </Typography>
@@ -40,4 +43,4 @@ function EventCard ({
   )
 }
 
-export default memo(EventCard);
+export default memo(EventCard)

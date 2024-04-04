@@ -1,20 +1,28 @@
-import { CalendarDate, CalendarEvent, UpdateEventInput } from "@/types";
+import { format } from 'date-fns'
+import { useCallback, useMemo, MouseEvent } from 'react'
 
-import { Box, Typography } from "@mui/material";
-import { format } from "date-fns";
-import { useCalendar, useTheme } from "./hooks";
-import TimeGuide from "./TimeGuide";
-import EventCard from "./EventCard";
-import { useMemo, useState } from "react";
-import { createEventCardProps } from "./EventCard/utilities";
-import { appendEventToEvents, getRowCount } from "./utilities";
+import { Box, Typography } from '@mui/material'
+
+import { CalendarDate, CalendarEvent, UpdateEventInput } from '@/types'
+
+import EventCard from './EventCard'
+import { createEventCardProps } from './EventCard/utilities'
+import TimeGuide from './TimeGuide'
+import { useCalendar, useTheme } from './hooks'
+import { appendEventToEvents, getRowCount } from './utilities'
 
 export default function DateRow ({
   date
 }: {
   date: CalendarDate
 }) {
-  const { minuteWidth, rowHeadWidth, eventHeight, zIndex } = useTheme()
+  const {
+    minuteWidth,
+    rowHeadWidth,
+    eventHeight,
+    rowFootWidth,
+    zIndex,
+  } = useTheme()
   const {
     state: {
       drag: dragState,
@@ -27,17 +35,12 @@ export default function DateRow ({
     }
   } = useCalendar()
 
-  const bodyWidth = minuteWidth * 60 * 24
-
-  const {
-    displayEvents,
-    rowCount,
-  } = useMemo(() => {
+  const { displayEvents, rowCount } = useMemo(() => {
     const dragging = !!dragState
     if (!dragging) {
       return {
         displayEvents: date.events,
-        rowCount: getRowCount(date.events)
+        rowCount     : getRowCount(date.events)
       }
     }
 
@@ -49,7 +52,7 @@ export default function DateRow ({
     if (!toBeDrop || rowToDrop === null || timeToDrop === null) {
       return {
         displayEvents: notDraggingEvents,
-        rowCount: getRowCount(notDraggingEvents)
+        rowCount     : getRowCount(notDraggingEvents)
       }
     }
 
@@ -64,10 +67,93 @@ export default function DateRow ({
 
     return {
       displayEvents: appendedDraggingEvent,
-      rowCount: Math.max(getRowCount(notDraggingEvents) + 1, getRowCount(appendedDraggingEvent))
+      rowCount     : Math.max(getRowCount(notDraggingEvents) + 1, getRowCount(appendedDraggingEvent))
     }
   }, [date.date, date.events, date.id, dragState])
 
+  const handleDrag = useCallback((e: MouseEvent) => {
+    if (!dragState) return
+
+    const duration = dragState.event.end.getTime() - dragState.event.start.getTime()
+    const durationAsMuinutes = duration / (1000 * 60)
+    const maxMinutes = 24 * 60 - durationAsMuinutes
+
+    const area = date.id
+    const row = Math.floor(e.nativeEvent.offsetY / eventHeight)
+    const timeAsMinutes = Math.min(maxMinutes, Math.floor((
+      e.nativeEvent.offsetX
+      - (dragState.ui?.offsetX ?? 0)
+    ) / minuteWidth))
+    const roundedTimeAsMinutes = Math.floor(timeAsMinutes / minuteUnit) * minuteUnit
+
+    const hours = Math.floor(roundedTimeAsMinutes / 60)
+    const minutes = roundedTimeAsMinutes % 60
+    const time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    drag({ area, row, time })
+  }, [date.id, drag, dragState, eventHeight, minuteUnit, minuteWidth])
+
+  const dragStartHandlerById = useMemo(() => {
+    const dragStartHandlerById: Record<string, (event: MouseEvent) => any> = {}
+    for (const event of displayEvents) {
+      dragStartHandlerById[event.id] = function (e: MouseEvent) {
+        dragStart({
+          event,
+          toDrop: {
+            area: date.id,
+            row : event.row,
+            time: format(event.start, 'HH:mm')
+          },
+          ui: {
+            offsetX: e.nativeEvent.offsetX,
+            offsetY: e.nativeEvent.offsetY
+          }
+        })
+      }
+    }
+    return dragStartHandlerById
+  }, [date.id, displayEvents, dragStart])
+
+  const handleDrop = useCallback(() => {
+    const updateInputs: UpdateEventInput[] = []
+
+    const nextEventById: Record<string, CalendarEvent> = {}
+
+    const currentEventById: Record<string, CalendarEvent> = {}
+    for (const event of date.events) {
+      currentEventById[event.id] = event
+    }
+
+    for (const event of displayEvents) {
+      const id = event.id
+      const current = currentEventById[id]
+
+      const currentStart = current ? current.start.toISOString() : null
+      const currentEnd = current ? current.end.toISOString() : null
+      const currentRow = current ? current.row : null
+      const nextStart = event.start.toISOString()
+      const nextEnd = event.end.toISOString()
+      const nextRow = event.row
+
+      if (
+        currentStart === nextStart
+        && currentEnd === nextEnd
+        && currentRow === nextRow
+      ) continue
+
+      updateInputs.push({
+        id,
+        start: nextStart,
+        end  : nextEnd,
+        row  : nextRow
+      })
+
+      nextEventById[event.id] = event
+    }
+
+    bulkUpdate(updateInputs)
+  }, [bulkUpdate, date.events, displayEvents])
+
+  const bodyWidth = minuteWidth * 60 * 24
   const height = eventHeight * rowCount
 
   return (
@@ -107,22 +193,16 @@ export default function DateRow ({
           height={height} />
         <Box>
           {displayEvents.map(event => {
-            const props = createEventCardProps(event, { eventHeight, minuteWidth, zIndex: zIndex.eventCard })
+            const props = createEventCardProps(event, {
+              eventHeight,
+              minuteWidth,
+              zIndex: zIndex.eventCard
+            })
             return (
               <EventCard
                 key={event.id}
-                onMouseDown={(e) => dragStart({
-                  event,
-                  toDrop: {
-                    area: date.id,
-                    row: event.row,
-                    time: format(event.start, 'HH:mm')
-                  },
-                  ui: {
-                    offsetX: e.nativeEvent.offsetX,
-                    offsetY: e.nativeEvent.offsetY
-                  }
-                })}
+                dragging={dragState?.event.id === event.id}
+                onMouseDown={dragStartHandlerById[event.id]}
                 {...props} />
             )
           })}
@@ -132,64 +212,12 @@ export default function DateRow ({
             width="100%"
             height="100%"
             zIndex={zIndex.dropArea}
-            sx={{
-              opacity: 0.1
-            }}
-            onMouseMove={(event) => {
-              const area = date.id
-              const row = Math.floor(event.nativeEvent.offsetY / eventHeight)
-              const timeAsMinutes = Math.floor((
-                event.nativeEvent.offsetX
-                - (dragState.ui?.offsetX ?? 0)
-              ) / minuteWidth)
-              const roundedTimeAsMinutes = Math.floor(timeAsMinutes / minuteUnit) * minuteUnit
-              const hours = Math.floor(roundedTimeAsMinutes / 60)
-              const minutes = roundedTimeAsMinutes % 60
-              const time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-              drag({ area, row, time })
-            }}
-            onMouseUp={() => {
-              const updateInputs: UpdateEventInput[] = []
-
-              const nextEventById: Record<string, CalendarEvent> = {}
-
-              const currentEventById: Record<string, CalendarEvent> = {}
-              for (const event of date.events) {
-                currentEventById[event.id] = event
-              }
-
-              for (const event of displayEvents) {
-                const id = event.id
-                const current = currentEventById[id]
-
-                const currentStart = current ? current.start.toISOString() : null
-                const currentEnd = current ? current.end.toISOString() : null
-                const currentRow = current ? current.row : null
-                const nextStart = event.start.toISOString()
-                const nextEnd = event.end.toISOString()
-                const nextRow = event.row
-
-                if (
-                  currentStart === nextStart
-                  && currentEnd === nextEnd
-                  && currentRow === nextRow
-                ) continue
-
-                updateInputs.push({
-                  id,
-                  start: nextStart,
-                  end: nextEnd,
-                  row: nextRow
-                })
-
-                nextEventById[event.id] = event
-              }
-
-              bulkUpdate(updateInputs)
-            }} />
+            onMouseMove={handleDrag}
+            onMouseUp={handleDrop} />
         )}
         </Box>
       </Box>
+      <Box width={rowFootWidth} />
     </Box>
   )
 }

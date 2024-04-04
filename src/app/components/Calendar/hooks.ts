@@ -1,11 +1,13 @@
 'use client'
 
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from 'react'
+
+import { createCalendarPack } from '@/model/calendarPack'
 import { Event } from '@/types'
-import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
-import { ContextValue, Events, Helpers, ThemeContextValue } from "./types";
-import { initializer, reducer } from "./reducer";
-import { defaultContextValue, defaultHelpers, defaultState, defaultThemeContextValue } from "./constants";
-import { createCalendarPack } from '@/model/calendarPack';
+
+import { defaultContextValue, defaultHelpers, defaultThemeContextValue } from './constants'
+import { initializer, reducer } from './reducer'
+import { ContextValue, Events, Helpers, ThemeContextValue } from './types'
 
 export const Context = createContext<ContextValue>(defaultContextValue)
 export const ThemeContext = createContext<ThemeContextValue>(defaultThemeContextValue)
@@ -50,7 +52,7 @@ export function useContextValue ({
   return {
     state,
     helpers,
-    refs:{
+    refs: {
       inner: innerRef
     }
   }

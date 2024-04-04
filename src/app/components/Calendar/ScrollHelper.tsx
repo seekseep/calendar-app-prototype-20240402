@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react'
 
-import { Box } from "@mui/material";
-import { useCalendar, useTheme } from "./hooks";
-import { useEffect, useState } from "react";
+import { Box } from '@mui/material'
+
+import { useCalendar, useTheme } from './hooks'
 
 const SCROLL_SIZE = 10
 
@@ -16,24 +17,22 @@ export default function ScrollHelper () {
     if (!innerRef?.current) return
     if (vector == null) return
 
-    let timer: NodeJS.Timeout | null = null
+    let timer: number | null = null
     function step () {
       const inner = innerRef?.current
       if (!inner) return
       if (vector == null) return
       inner.scrollLeft += vector.x
       inner.scrollTop += vector.y
-      timer = setTimeout(step, 50)
+      timer = window.setTimeout(step, 50)
     }
 
-    timer = setTimeout(step, 50)
+    timer = window.setTimeout(step, 50)
 
     return () => {
       timer && clearTimeout(timer)
     }
   }, [drag, innerRef, vector])
-
-
 
   if (!drag) return null
 

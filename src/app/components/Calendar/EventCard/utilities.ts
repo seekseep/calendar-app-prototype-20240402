@@ -1,5 +1,6 @@
-import { CalendarEvent } from "@/types"
-import { EventCardProps } from "./types"
+import { CalendarEvent } from '@/types'
+
+import { EventCardProps } from './types'
 
 export function createEventCardProps (event: CalendarEvent, {
   eventHeight, minuteWidth, offsetMinutes = 0, zIndex
@@ -10,10 +11,9 @@ export function createEventCardProps (event: CalendarEvent, {
   zIndex: number
 }) : EventCardProps {
   const startMinutes = event.start.getHours() * 60 + event.start.getMinutes()
-  const endMinutes = event.end.getHours() * 60 + event.end.getMinutes()
-  const durationMinutes = endMinutes - startMinutes
-  const row = event.row
+  const durationMinutes = (event.end.getTime() - event.start.getTime()) / (1000 * 60)
 
+  const row = event.row
   const label = event.label
   const top = row * eventHeight
   const left = startMinutes * minuteWidth - offsetMinutes

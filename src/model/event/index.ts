@@ -1,8 +1,10 @@
-import { Event } from "@/types";
-import { add, format, set } from "date-fns";
+import { add, format, set } from 'date-fns'
+
 import { v4 as uuid } from 'uuid'
 
-export function createEvent (label: string, date: string, startTime: string, endTime: string, row?: number): Event {
+import { Event } from '@/types'
+
+export function createEvent (label: string, date: string, startTime: string, durationAsMinutes: number, row?: number): Event {
   const baseDate = new Date(date)
   if (isNaN(baseDate.getTime())) throw new Error('Invalid date')
 
@@ -10,323 +12,50 @@ export function createEvent (label: string, date: string, startTime: string, end
   const start = set(baseDate, { hours: startHours, minutes: startMinutes })
   if (isNaN(start.getTime())) throw new Error('Invalid start time')
 
-  const [endHours, endMinutes] = endTime.split(':').map(Number)
-  const end = set(baseDate, { hours: endHours, minutes: endMinutes })
-  if (isNaN(end.getTime())) throw new Error('Invalid end time')
+  const end = add(start, { minutes: durationAsMinutes })
 
   return {
-    id: uuid(),
+    id   : uuid(),
     label,
     start: start.toISOString(),
-    end: end.toISOString(),
-    row: row ?? 0
+    end  : end.toISOString(),
+    row  : row ?? 0
   }
 }
-
 
 export function createDefaultEvents () {
   const subjects = [
     '国語', '数学', '英語', '日本史'
   ]
-
-  return [
-    createEvent(`${subjects[0]}-{wash}`, '2022-04-02', '09:00', '10:00'),
-    createEvent(`${subjects[1]}-{row}`, '2022-04-02', '09:00', '10:00'),
-    createEvent(`${subjects[2]}-{girl}`, '2022-04-02', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{traffic}`, '2022-04-02', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{pair}`, '2022-04-02', '09:30', '10:30'),
-    createEvent(`${subjects[2]}-{save}`, '2022-04-02', '09:30', '10:30'),
-    createEvent(`${subjects[0]}-{danger}`, '2022-04-02', '09:45', '10:45'),
-    createEvent(`${subjects[1]}-{day}`, '2022-04-02', '09:45', '10:45'),
-    createEvent(`${subjects[0]}-{protection}`, '2022-04-02', '09:00', '09:30'),
-    createEvent(`${subjects[1]}-{telephone}`, '2022-04-02', '09:00', '09:30'),
-    createEvent(`${subjects[2]}-{eager}`, '2022-04-02', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{men}`, '2022-04-02', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{higher}`, '2022-04-02', '09:45', '10:15'),
-    createEvent(`${subjects[2]}-{thee}`, '2022-04-02', '09:45', '10:15'),
-
-    createEvent(`${subjects[0]}-{double}`, '2022-04-02', '10:00', '11:00'),
-    createEvent(`${subjects[1]}-{nodded}`, '2022-04-02', '10:00', '11:00'),
-    createEvent(`${subjects[2]}-{paint}`, '2022-04-02', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{doubt}`, '2022-04-02', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{east}`, '2022-04-02', '10:30', '11:30'),
-    createEvent(`${subjects[2]}-{base}`, '2022-04-02', '10:30', '11:30'),
-    createEvent(`${subjects[0]}-{screen}`, '2022-04-02', '10:45', '11:45'),
-    createEvent(`${subjects[1]}-{breakfast}`, '2022-04-02', '10:45', '11:45'),
-    createEvent(`${subjects[0]}-{waste}`, '2022-04-02', '10:00', '10:30'),
-    createEvent(`${subjects[1]}-{individual}`, '2022-04-02', '10:00', '10:30'),
-    createEvent(`${subjects[2]}-{too}`, '2022-04-02', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{point}`, '2022-04-02', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{bark}`, '2022-04-02', '10:45', '11:15'),
-    createEvent(`${subjects[2]}-{activity}`, '2022-04-02', '10:45', '11:15'),
-
-    createEvent(`${subjects[0]}-{long}`, '2022-04-02', '11:00', '12:00'),
-    createEvent(`${subjects[1]}-{wall}`, '2022-04-02', '11:00', '12:00'),
-    createEvent(`${subjects[2]}-{cake}`, '2022-04-02', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{expect}`, '2022-04-02', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{bear}`, '2022-04-02', '11:30', '12:30'),
-    createEvent(`${subjects[2]}-{likely}`, '2022-04-02', '11:30', '12:30'),
-    createEvent(`${subjects[0]}-{church}`, '2022-04-02', '11:45', '12:45'),
-    createEvent(`${subjects[1]}-{remember}`, '2022-04-02', '11:45', '12:45'),
-    createEvent(`${subjects[0]}-{community}`, '2022-04-02', '11:00', '11:30'),
-    createEvent(`${subjects[1]}-{citizen}`, '2022-04-02', '11:00', '11:30'),
-    createEvent(`${subjects[2]}-{community}`, '2022-04-02', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{hello}`, '2022-04-02', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{sail}`, '2022-04-02', '11:45', '12:15'),
-    createEvent(`${subjects[2]}-{scientist}`, '2022-04-02', '11:45', '12:15'),
-
-    createEvent(`${subjects[0]}-{forest}`, '2022-04-02', '12:00', '13:00'),
-    createEvent(`${subjects[1]}-{instance}`, '2022-04-02', '12:00', '13:00'),
-    createEvent(`${subjects[2]}-{horn}`, '2022-04-02', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{cry}`, '2022-04-02', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{report}`, '2022-04-02', '12:30', '13:30'),
-    createEvent(`${subjects[2]}-{church}`, '2022-04-02', '12:30', '13:30'),
-    createEvent(`${subjects[0]}-{us}`, '2022-04-02', '12:45', '13:45'),
-    createEvent(`${subjects[1]}-{dream}`, '2022-04-02', '12:45', '13:45'),
-    createEvent(`${subjects[0]}-{silent}`, '2022-04-02', '12:00', '12:30'),
-    createEvent(`${subjects[1]}-{edge}`, '2022-04-02', '12:00', '12:30'),
-    createEvent(`${subjects[2]}-{table}`, '2022-04-02', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{author}`, '2022-04-02', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{organization}`, '2022-04-02', '12:45', '13:15'),
-    createEvent(`${subjects[2]}-{tin}`, '2022-04-02', '12:45', '13:15'),
-
-    createEvent(`${subjects[0]}-{rocky}`, '2022-04-03', '09:00', '10:00'),
-    createEvent(`${subjects[1]}-{tank}`, '2022-04-03', '09:00', '10:00'),
-    createEvent(`${subjects[2]}-{element}`, '2022-04-03', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{lady}`, '2022-04-03', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{origin}`, '2022-04-03', '09:30', '10:30'),
-    createEvent(`${subjects[2]}-{twenty}`, '2022-04-03', '09:30', '10:30'),
-    createEvent(`${subjects[0]}-{captain}`, '2022-04-03', '09:45', '10:45'),
-    createEvent(`${subjects[1]}-{arrangement}`, '2022-04-03', '09:45', '10:45'),
-    createEvent(`${subjects[0]}-{nothing}`, '2022-04-03', '09:00', '09:30'),
-    createEvent(`${subjects[1]}-{want}`, '2022-04-03', '09:00', '09:30'),
-    createEvent(`${subjects[2]}-{fellow}`, '2022-04-03', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{read}`, '2022-04-03', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{put}`, '2022-04-03', '09:45', '10:15'),
-    createEvent(`${subjects[2]}-{burn}`, '2022-04-03', '09:45', '10:15'),
-
-    createEvent(`${subjects[0]}-{shorter}`, '2022-04-03', '10:00', '11:00'),
-    createEvent(`${subjects[1]}-{musical}`, '2022-04-03', '10:00', '11:00'),
-    createEvent(`${subjects[2]}-{toy}`, '2022-04-03', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{clock}`, '2022-04-03', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{equipment}`, '2022-04-03', '10:30', '11:30'),
-    createEvent(`${subjects[2]}-{sun}`, '2022-04-03', '10:30', '11:30'),
-    createEvent(`${subjects[0]}-{spider}`, '2022-04-03', '10:45', '11:45'),
-    createEvent(`${subjects[1]}-{former}`, '2022-04-03', '10:45', '11:45'),
-    createEvent(`${subjects[0]}-{belt}`, '2022-04-03', '10:00', '10:30'),
-    createEvent(`${subjects[1]}-{wife}`, '2022-04-03', '10:00', '10:30'),
-    createEvent(`${subjects[2]}-{lady}`, '2022-04-03', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{merely}`, '2022-04-03', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{hide}`, '2022-04-03', '10:45', '11:15'),
-    createEvent(`${subjects[2]}-{gulf}`, '2022-04-03', '10:45', '11:15'),
-
-    createEvent(`${subjects[0]}-{tried}`, '2022-04-03', '11:00', '12:00'),
-    createEvent(`${subjects[1]}-{fellow}`, '2022-04-03', '11:00', '12:00'),
-    createEvent(`${subjects[2]}-{smallest}`, '2022-04-03', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{monkey}`, '2022-04-03', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{event}`, '2022-04-03', '11:30', '12:30'),
-    createEvent(`${subjects[2]}-{ability}`, '2022-04-03', '11:30', '12:30'),
-    createEvent(`${subjects[0]}-{struck}`, '2022-04-03', '11:45', '12:45'),
-    createEvent(`${subjects[1]}-{stand}`, '2022-04-03', '11:45', '12:45'),
-    createEvent(`${subjects[0]}-{cat}`, '2022-04-03', '11:00', '11:30'),
-    createEvent(`${subjects[1]}-{save}`, '2022-04-03', '11:00', '11:30'),
-    createEvent(`${subjects[2]}-{layers}`, '2022-04-03', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{particularly}`, '2022-04-03', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{fallen}`, '2022-04-03', '11:45', '12:15'),
-    createEvent(`${subjects[2]}-{street}`, '2022-04-03', '11:45', '12:15'),
-    createEvent(`${subjects[0]}-{continued}`, '2022-04-03', '12:00', '13:00'),
-    createEvent(`${subjects[1]}-{heart}`, '2022-04-03', '12:00', '13:00'),
-    createEvent(`${subjects[2]}-{gentle}`, '2022-04-03', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{forgot}`, '2022-04-03', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{guide}`, '2022-04-03', '12:30', '13:30'),
-    createEvent(`${subjects[2]}-{hungry}`, '2022-04-03', '12:30', '13:30'),
-    createEvent(`${subjects[0]}-{bare}`, '2022-04-03', '12:45', '13:45'),
-    createEvent(`${subjects[1]}-{idea}`, '2022-04-03', '12:45', '13:45'),
-    createEvent(`${subjects[0]}-{gold}`, '2022-04-03', '12:00', '12:30'),
-    createEvent(`${subjects[1]}-{rain}`, '2022-04-03', '12:00', '12:30'),
-    createEvent(`${subjects[2]}-{war}`, '2022-04-03', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{plane}`, '2022-04-03', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{relationship}`, '2022-04-03', '12:45', '13:15'),
-    createEvent(`${subjects[2]}-{pocket}`, '2022-04-03', '12:45', '13:15'),
-
-    createEvent(`${subjects[0]}-{place}`, '2022-04-04', '09:00', '10:00'),
-    createEvent(`${subjects[1]}-{ruler}`, '2022-04-04', '09:00', '10:00'),
-    createEvent(`${subjects[2]}-{simple}`, '2022-04-04', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{steel}`, '2022-04-04', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{donkey}`, '2022-04-04', '09:30', '10:30'),
-    createEvent(`${subjects[2]}-{desert}`, '2022-04-04', '09:30', '10:30'),
-    createEvent(`${subjects[0]}-{wife}`, '2022-04-04', '09:45', '10:45'),
-    createEvent(`${subjects[1]}-{young}`, '2022-04-04', '09:45', '10:45'),
-    createEvent(`${subjects[0]}-{yard}`, '2022-04-04', '09:00', '09:30'),
-    createEvent(`${subjects[1]}-{tropical}`, '2022-04-04', '09:00', '09:30'),
-    createEvent(`${subjects[2]}-{mud}`, '2022-04-04', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{wealth}`, '2022-04-04', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{rising}`, '2022-04-04', '09:45', '10:15'),
-    createEvent(`${subjects[2]}-{dozen}`, '2022-04-04', '09:45', '10:15'),
-
-    createEvent(`${subjects[0]}-{brick}`, '2022-04-04', '10:00', '11:00'),
-    createEvent(`${subjects[1]}-{climate}`, '2022-04-04', '10:00', '11:00'),
-    createEvent(`${subjects[2]}-{review}`, '2022-04-04', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{fireplace}`, '2022-04-04', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{farther}`, '2022-04-04', '10:30', '11:30'),
-    createEvent(`${subjects[2]}-{tax}`, '2022-04-04', '10:30', '11:30'),
-    createEvent(`${subjects[0]}-{guess}`, '2022-04-04', '10:45', '11:45'),
-    createEvent(`${subjects[1]}-{examine}`, '2022-04-04', '10:45', '11:45'),
-    createEvent(`${subjects[0]}-{colony}`, '2022-04-04', '10:00', '10:30'),
-    createEvent(`${subjects[1]}-{dull}`, '2022-04-04', '10:00', '10:30'),
-    createEvent(`${subjects[2]}-{did}`, '2022-04-04', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{chance}`, '2022-04-04', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{silk}`, '2022-04-04', '10:45', '11:15'),
-    createEvent(`${subjects[2]}-{lift}`, '2022-04-04', '10:45', '11:15'),
-
-    createEvent(`${subjects[0]}-{salmon}`, '2022-04-04', '11:00', '12:00'),
-    createEvent(`${subjects[1]}-{point}`, '2022-04-04', '11:00', '12:00'),
-    createEvent(`${subjects[2]}-{given}`, '2022-04-04', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{best}`, '2022-04-04', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{train}`, '2022-04-04', '11:30', '12:30'),
-    createEvent(`${subjects[2]}-{son}`, '2022-04-04', '11:30', '12:30'),
-    createEvent(`${subjects[0]}-{plural}`, '2022-04-04', '11:45', '12:45'),
-    createEvent(`${subjects[1]}-{buried}`, '2022-04-04', '11:45', '12:45'),
-    createEvent(`${subjects[0]}-{alphabet}`, '2022-04-04', '11:00', '11:30'),
-    createEvent(`${subjects[1]}-{exercise}`, '2022-04-04', '11:00', '11:30'),
-    createEvent(`${subjects[2]}-{character}`, '2022-04-04', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{food}`, '2022-04-04', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{lamp}`, '2022-04-04', '11:45', '12:15'),
-    createEvent(`${subjects[2]}-{these}`, '2022-04-04', '11:45', '12:15'),
-
-    createEvent(`${subjects[0]}-{opposite}`, '2022-04-04', '12:00', '13:00'),
-    createEvent(`${subjects[1]}-{also}`, '2022-04-04', '12:00', '13:00'),
-    createEvent(`${subjects[2]}-{listen}`, '2022-04-04', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{come}`, '2022-04-04', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{younger}`, '2022-04-04', '12:30', '13:30'),
-    createEvent(`${subjects[2]}-{accept}`, '2022-04-04', '12:30', '13:30'),
-    createEvent(`${subjects[0]}-{percent}`, '2022-04-04', '12:45', '13:45'),
-    createEvent(`${subjects[1]}-{jungle}`, '2022-04-04', '12:45', '13:45'),
-    createEvent(`${subjects[0]}-{simplest}`, '2022-04-04', '12:00', '12:30'),
-    createEvent(`${subjects[1]}-{weather}`, '2022-04-04', '12:00', '12:30'),
-    createEvent(`${subjects[2]}-{crowd}`, '2022-04-04', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{probably}`, '2022-04-04', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{present}`, '2022-04-04', '12:45', '13:15'),
-    createEvent(`${subjects[2]}-{off}`, '2022-04-04', '12:45', '13:15'),
-
-    createEvent(`${subjects[0]}-{queen}`, '2022-04-05', '09:00', '10:00'),
-    createEvent(`${subjects[1]}-{finest}`, '2022-04-05', '09:00', '10:00'),
-    createEvent(`${subjects[2]}-{farther}`, '2022-04-05', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{parts}`, '2022-04-05', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{sitting}`, '2022-04-05', '09:30', '10:30'),
-    createEvent(`${subjects[2]}-{hang}`, '2022-04-05', '09:30', '10:30'),
-    createEvent(`${subjects[0]}-{trace}`, '2022-04-05', '09:45', '10:45'),
-    createEvent(`${subjects[1]}-{familiar}`, '2022-04-05', '09:45', '10:45'),
-    createEvent(`${subjects[0]}-{ball}`, '2022-04-05', '09:00', '09:30'),
-    createEvent(`${subjects[1]}-{tide}`, '2022-04-05', '09:00', '09:30'),
-    createEvent(`${subjects[2]}-{rod}`, '2022-04-05', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{empty}`, '2022-04-05', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{exactly}`, '2022-04-05', '09:45', '10:15'),
-    createEvent(`${subjects[2]}-{condition}`, '2022-04-05', '09:45', '10:15'),
-
-    createEvent(`${subjects[0]}-{older}`, '2022-04-05', '10:00', '11:00'),
-    createEvent(`${subjects[1]}-{respect}`, '2022-04-05', '10:00', '11:00'),
-    createEvent(`${subjects[2]}-{roof}`, '2022-04-05', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{many}`, '2022-04-05', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{wife}`, '2022-04-05', '10:30', '11:30'),
-    createEvent(`${subjects[2]}-{folks}`, '2022-04-05', '10:30', '11:30'),
-    createEvent(`${subjects[0]}-{its}`, '2022-04-05', '10:45', '11:45'),
-    createEvent(`${subjects[1]}-{strip}`, '2022-04-05', '10:45', '11:45'),
-    createEvent(`${subjects[0]}-{medicine}`, '2022-04-05', '10:00', '10:30'),
-    createEvent(`${subjects[1]}-{vapor}`, '2022-04-05', '10:00', '10:30'),
-    createEvent(`${subjects[2]}-{above}`, '2022-04-05', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{before}`, '2022-04-05', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{giving}`, '2022-04-05', '10:45', '11:15'),
-    createEvent(`${subjects[2]}-{classroom}`, '2022-04-05', '10:45', '11:15'),
-
-    createEvent(`${subjects[0]}-{acres}`, '2022-04-05', '11:00', '12:00'),
-    createEvent(`${subjects[1]}-{pencil}`, '2022-04-05', '11:00', '12:00'),
-    createEvent(`${subjects[2]}-{old}`, '2022-04-05', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{fair}`, '2022-04-05', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{people}`, '2022-04-05', '11:30', '12:30'),
-    createEvent(`${subjects[2]}-{thee}`, '2022-04-05', '11:30', '12:30'),
-    createEvent(`${subjects[0]}-{whenever}`, '2022-04-05', '11:45', '12:45'),
-    createEvent(`${subjects[1]}-{such}`, '2022-04-05', '11:45', '12:45'),
-    createEvent(`${subjects[0]}-{pencil}`, '2022-04-05', '11:00', '11:30'),
-    createEvent(`${subjects[1]}-{parts}`, '2022-04-05', '11:00', '11:30'),
-    createEvent(`${subjects[2]}-{before}`, '2022-04-05', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{tone}`, '2022-04-05', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{torn}`, '2022-04-05', '11:45', '12:15'),
-    createEvent(`${subjects[2]}-{simplest}`, '2022-04-05', '11:45', '12:15'),
-
-    createEvent(`${subjects[0]}-{several}`, '2022-04-05', '12:00', '13:00'),
-    createEvent(`${subjects[1]}-{load}`, '2022-04-05', '12:00', '13:00'),
-    createEvent(`${subjects[2]}-{brush}`, '2022-04-05', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{field}`, '2022-04-05', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{partly}`, '2022-04-05', '12:30', '13:30'),
-    createEvent(`${subjects[2]}-{jump}`, '2022-04-05', '12:30', '13:30'),
-    createEvent(`${subjects[0]}-{win}`, '2022-04-05', '12:45', '13:45'),
-    createEvent(`${subjects[1]}-{order}`, '2022-04-05', '12:45', '13:45'),
-    createEvent(`${subjects[0]}-{slide}`, '2022-04-05', '12:00', '12:30'),
-    createEvent(`${subjects[1]}-{remember}`, '2022-04-05', '12:00', '12:30'),
-    createEvent(`${subjects[2]}-{cake}`, '2022-04-05', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{mathematics}`, '2022-04-05', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{policeman}`, '2022-04-05', '12:45', '13:15'),
-    createEvent(`${subjects[2]}-{find}`, '2022-04-05', '12:45', '13:15'),
-
-    createEvent(`${subjects[0]}-{hurt}`, '2022-04-06', '09:00', '10:00'),
-    createEvent(`${subjects[1]}-{unusual}`, '2022-04-06', '09:00', '10:00'),
-    createEvent(`${subjects[2]}-{explanation}`, '2022-04-06', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{low}`, '2022-04-06', '09:15', '10:15'),
-    createEvent(`${subjects[2]}-{lion}`, '2022-04-06', '09:30', '10:30'),
-    createEvent(`${subjects[2]}-{cross}`, '2022-04-06', '09:30', '10:30'),
-    createEvent(`${subjects[0]}-{least}`, '2022-04-06', '09:45', '10:45'),
-    createEvent(`${subjects[1]}-{supper}`, '2022-04-06', '09:45', '10:45'),
-    createEvent(`${subjects[0]}-{knife}`, '2022-04-06', '09:00', '09:30'),
-    createEvent(`${subjects[1]}-{chain}`, '2022-04-06', '09:00', '09:30'),
-    createEvent(`${subjects[2]}-{stood}`, '2022-04-06', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{excited}`, '2022-04-06', '09:15', '09:45'),
-    createEvent(`${subjects[2]}-{brass}`, '2022-04-06', '09:45', '10:15'),
-    createEvent(`${subjects[2]}-{science}`, '2022-04-06', '09:45', '10:15'),
-
-    createEvent(`${subjects[0]}-{tried}`, '2022-04-06', '10:00', '11:00'),
-    createEvent(`${subjects[1]}-{good}`, '2022-04-06', '10:00', '11:00'),
-    createEvent(`${subjects[2]}-{successful}`, '2022-04-06', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{safety}`, '2022-04-06', '10:15', '11:15'),
-    createEvent(`${subjects[2]}-{suit}`, '2022-04-06', '10:30', '11:30'),
-    createEvent(`${subjects[2]}-{drink}`, '2022-04-06', '10:30', '11:30'),
-    createEvent(`${subjects[0]}-{fuel}`, '2022-04-06', '10:45', '11:45'),
-    createEvent(`${subjects[1]}-{sight}`, '2022-04-06', '10:45', '11:45'),
-    createEvent(`${subjects[0]}-{market}`, '2022-04-06', '10:00', '10:30'),
-    createEvent(`${subjects[1]}-{decide}`, '2022-04-06', '10:00', '10:30'),
-    createEvent(`${subjects[2]}-{molecular}`, '2022-04-06', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{get}`, '2022-04-06', '10:15', '10:45'),
-    createEvent(`${subjects[2]}-{nervous}`, '2022-04-06', '10:45', '11:15'),
-    createEvent(`${subjects[2]}-{usual}`, '2022-04-06', '10:45', '11:15'),
-
-    createEvent(`${subjects[0]}-{surrounded}`, '2022-04-06', '11:00', '12:00'),
-    createEvent(`${subjects[1]}-{closely}`, '2022-04-06', '11:00', '12:00'),
-    createEvent(`${subjects[2]}-{trail}`, '2022-04-06', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{ground}`, '2022-04-06', '11:15', '12:15'),
-    createEvent(`${subjects[2]}-{slide}`, '2022-04-06', '11:30', '12:30'),
-    createEvent(`${subjects[2]}-{chosen}`, '2022-04-06', '11:30', '12:30'),
-    createEvent(`${subjects[0]}-{trap}`, '2022-04-06', '11:45', '12:45'),
-    createEvent(`${subjects[1]}-{wooden}`, '2022-04-06', '11:45', '12:45'),
-    createEvent(`${subjects[0]}-{barn}`, '2022-04-06', '11:00', '11:30'),
-    createEvent(`${subjects[1]}-{sharp}`, '2022-04-06', '11:00', '11:30'),
-    createEvent(`${subjects[2]}-{never}`, '2022-04-06', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{every}`, '2022-04-06', '11:15', '11:45'),
-    createEvent(`${subjects[2]}-{smell}`, '2022-04-06', '11:45', '12:15'),
-    createEvent(`${subjects[2]}-{strip}`, '2022-04-06', '11:45', '12:15'),
-
-    createEvent(`${subjects[0]}-{fill}`, '2022-04-06', '12:00', '13:00'),
-    createEvent(`${subjects[1]}-{something}`, '2022-04-06', '12:00', '13:00'),
-    createEvent(`${subjects[2]}-{shells}`, '2022-04-06', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{constantly}`, '2022-04-06', '12:15', '13:15'),
-    createEvent(`${subjects[2]}-{dead}`, '2022-04-06', '12:30', '13:30'),
-    createEvent(`${subjects[2]}-{perfectly}`, '2022-04-06', '12:30', '13:30'),
-    createEvent(`${subjects[0]}-{fish}`, '2022-04-06', '12:45', '13:45'),
-    createEvent(`${subjects[1]}-{led}`, '2022-04-06', '12:45', '13:45'),
-    createEvent(`${subjects[0]}-{roll}`, '2022-04-06', '12:00', '12:30'),
-    createEvent(`${subjects[1]}-{source}`, '2022-04-06', '12:00', '12:30'),
-    createEvent(`${subjects[2]}-{respect}`, '2022-04-06', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{silence}`, '2022-04-06', '12:15', '12:45'),
-    createEvent(`${subjects[2]}-{burn}`, '2022-04-06', '12:45', '13:15'),
-    createEvent(`${subjects[2]}-{agree}`, '2022-04-06', '12:45', '13:15'),
+  const words = [
+    '中学', '高校', '小学'
   ]
+
+  const baseDate = new Date('2022-04-01')
+  const events: Event[] = [
+    createEvent(`${subjects[0]}-${words[0]}`, format(baseDate, 'yyyy-MM-dd'), '23:00', 60)
+  ]
+
+  // for (let i = 0; i < 7; i++) {
+  //   for (let s = 0; s < 6; s++) {
+  //     const date =  format(add(baseDate, { days: i }), 'yyyy-MM-dd')
+  //     for (let j = 0; j < 2; j++) {
+  //       events.push(...[
+  //         createEvent(`${subjects[0]}-${words[0]}`, date, `${(9 + s + j)}:00`, 60),
+  //         createEvent(`${subjects[3]}-${words[1]}`, date, `${(9 + s + j)}:00`, 60),
+  //       ])
+  //     }
+  //     for (let j = 0; j < 2; j++) {
+  //       events.push(...[
+  //         createEvent(`${subjects[1]}-${words[2]}`, date, `${(9 + s + j)}:20`, 80),
+  //       ])
+  //     }
+  //     for (let j = 0; j < 2; j++) {
+  //       events.push(...[
+  //         createEvent(`${subjects[2]}-${words[1]}`, date, `${(9 + s + j)}:30`, 90),
+  //       ])
+  //     }
+  //   }
+  // }
+  return events
 }

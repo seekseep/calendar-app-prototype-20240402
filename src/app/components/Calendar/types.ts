@@ -1,5 +1,6 @@
-import { CalendarPack as Pack, CalendarEvent, UpdateEventInput } from "@/types"
-import { RefObject } from "react"
+import { RefObject } from 'react'
+
+import { CalendarPack as Pack, CalendarEvent, UpdateEventInput } from '@/types'
 
 type DropArea = string
 
@@ -25,26 +26,26 @@ export interface State {
 }
 
 export type DragStartAction = {
-  type: "dragStart"
+  type: 'dragStart'
   payload: DragState
 }
 
 export type DragAction = {
-  type: "drag"
+  type: 'drag'
   payload: ToDrop | null
 }
 
 export type DragEndAction = {
-  type: "dragEnd"
+  type: 'dragEnd'
 }
 
 export type SetPackAction = {
-  type: "setPack"
+  type: 'setPack'
   payload: Pack
 }
 
 export type SetMinuteUnitAction = {
-  type: "setMinuteUnit"
+  type: 'setMinuteUnit'
   payload: number
 }
 
@@ -76,6 +77,7 @@ export interface ContextValue {
 
 export interface ThemeContextValue {
   rowHeadWidth: number
+  rowFootWidth: number
   minuteWidth: number
   toolbarHeight: number
   timeRulerHeight: number

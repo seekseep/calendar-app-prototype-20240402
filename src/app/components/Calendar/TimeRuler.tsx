@@ -1,4 +1,5 @@
 import { memo } from 'react'
+
 import { Box, Typography } from '@mui/material'
 
 function TimeRuler ({
@@ -33,9 +34,9 @@ function TimeRuler ({
         width={headWidth}
         flexShrink={0}
         sx={{
-          borderRightColor: 'divider',
-          borderRightStyle: 'solid',
-          borderRightWidth: 1,
+          borderRightColor : 'divider',
+          borderRightStyle : 'solid',
+          borderRightWidth : 1,
           borderBottomColor: 'divider',
           borderBottomStyle: 'solid',
           borderBottomWidth: 1
@@ -46,9 +47,9 @@ function TimeRuler ({
           flexShrink="0"
           px={0.25}
           sx={{
-            borderRightColor: 'divider',
-            borderRightStyle: 'solid',
-            borderRightWidth: 1,
+            borderRightColor : 'divider',
+            borderRightStyle : 'solid',
+            borderRightWidth : 1,
             borderBottomColor: 'divider',
             borderBottomStyle: 'solid',
             borderBottomWidth: 1

@@ -1,8 +1,9 @@
 'use client'
 
-import Calendar from "./Calendar";
-import { useEvents } from "@/hooks/event";
-import { createDefaultEvents } from "@/model/event";
+import { useEvents } from '@/hooks/event'
+import { createDefaultEvents } from '@/model/event'
+
+import Calendar from './Calendar'
 
 const initialEvents = createDefaultEvents()
 

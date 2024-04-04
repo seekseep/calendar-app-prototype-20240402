@@ -1,9 +1,9 @@
-import { ContextValue, Helpers, Refs, State, ThemeContextValue } from "./types";
+import { ContextValue, Helpers, Refs, State, ThemeContextValue } from './types'
 
 export const defaultState: State = {
   minuteUnit: 15,
-  pack: {
-    dates: [],
+  pack      : {
+    dates    : [],
     createdAt: ''
   },
   drag: null
@@ -14,35 +14,36 @@ const defaultRefs: Refs = {
 }
 
 export const defaultHelpers: Helpers = {
-  update: () => {},
-  bulkUpdate: () => {},
-  dragStart: () => {},
-  drag: () => {},
-  dragEnd: () => {},
+  update       : () => {},
+  bulkUpdate   : () => {},
+  dragStart    : () => {},
+  drag         : () => {},
+  dragEnd      : () => {},
   setMinuteUnit: () => {}
 }
 
 export const defaultContextValue: ContextValue = {
   helpers: defaultHelpers,
-  state: defaultState,
-  refs: defaultRefs
+  state  : defaultState,
+  refs   : defaultRefs
 }
 
 export const defaultThemeContextValue: ThemeContextValue = {
-  minuteWidth: 2,
-  toolbarHeight: 48,
-  eventHeight: 32,
-  timeRulerHeight: 24,
-  rowHeadWidth: 72,
+  minuteWidth     : 2,
+  toolbarHeight   : 48,
+  eventHeight     : 32,
+  timeRulerHeight : 24,
+  rowHeadWidth    : 72,
+  rowFootWidth    : 72,
   scrollHelperSize: 72,
-  zIndex: {
-    timeGuide: 100,
-    eventCard: 200,
-    dropArea: 300,
-    rowHead: 400,
-    timeRuler: 500,
-    toolbar: 600,
+  zIndex          : {
+    timeGuide   : 100,
+    eventCard   : 200,
+    dropArea    : 300,
+    rowHead     : 400,
+    timeRuler   : 500,
+    toolbar     : 600,
     scrollHelper: 700,
-    debugger: 700
+    debugger    : 700
   }
 }
