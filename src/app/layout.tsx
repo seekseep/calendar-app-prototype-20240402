@@ -5,6 +5,7 @@ import { ReactNode } from 'react'
 import { CssBaseline } from '@mui/material'
 
 import DashboardLayout from './components/DashboardLayout'
+import Provider from './components/Provider'
 
 const notoSansJp = Noto_Sans_JP({ subsets: ['latin'] })
 
@@ -22,9 +23,11 @@ export default function RootLayout({
     <html lang="ja">
       <body className={notoSansJp.className}>
         <CssBaseline />
-        <DashboardLayout>
-          {children}
-        </DashboardLayout>
+        <Provider>
+          <DashboardLayout>
+            {children}
+          </DashboardLayout>
+        </Provider>
       </body>
     </html>
   )

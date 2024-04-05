@@ -10,10 +10,14 @@ export function createEventCardProps (event: CalendarEvent, {
   minuteWidth: number
   zIndex: number
 }) : EventCardProps {
-  const startMinutes = event.start.getHours() * 60 + event.start.getMinutes()
-  const durationMinutes = (event.end.getTime() - event.start.getTime()) / (1000 * 60)
+  const {
+    startDateTime: start,
+    endDateTime: end
+  } = event
+  const startMinutes = start.getHours() * 60 + start.getMinutes()
+  const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60)
 
-  const row = event.row
+  const row = event.displayRow
   const label = event.label
   const top = row * eventHeight
   const left = startMinutes * minuteWidth - offsetMinutes

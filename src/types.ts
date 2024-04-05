@@ -4,15 +4,18 @@ export interface Event {
   end: string
   label: string
   row: number
+  updatedAt: string
+  createdAt: string
 }
 
 export type UpdateEventInput = (
   Pick<Event, 'id'> & Partial<Omit<Event, 'id'>>
 )
 
-export interface CalendarEvent extends Omit<Event, 'start' | 'end'> {
-  start: Date
-  end: Date
+export interface CalendarEvent extends Event {
+  startDateTime: Date
+  endDateTime: Date
+  displayRow: number
 }
 
 export interface CalendarDate {

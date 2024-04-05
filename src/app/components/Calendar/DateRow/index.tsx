@@ -3,13 +3,14 @@ import { useCallback, useMemo, MouseEvent } from 'react'
 
 import { Box, Typography } from '@mui/material'
 
-import { CalendarDate, CalendarEvent, UpdateEventInput } from '@/types'
+import { CalendarDate } from '@/types'
 
-import EventCard from './EventCard'
-import { createEventCardProps } from './EventCard/utilities'
-import TimeGuide from './TimeGuide'
-import { useCalendar, useTheme } from './hooks'
-import { appendEventToEvents, getRowCount } from './utilities'
+import EventCard from '../EventCard'
+import { createEventCardProps } from '../EventCard/utilities'
+import TimeGuide from '../TimeGuide'
+import { useCalendar, useTheme } from '../hooks'
+
+import { appendEventToEvents, createDroppedEvent, getRowCount } from './utilities'
 
 export default function DateRow ({
   date
@@ -31,7 +32,7 @@ export default function DateRow ({
     helpers: {
       dragStart,
       drag,
-      bulkUpdate
+      update,
     }
   } = useCalendar()
 
@@ -57,24 +58,19 @@ export default function DateRow ({
     }
 
     const dateToDrop = date.date
-    const appendedDraggingEvent = appendEventToEvents(
-      notDraggingEvents,
-      eventToDrop,
-      dateToDrop,
-      timeToDrop,
-      rowToDrop,
-    )
+    const appendedEvent = createDroppedEvent(eventToDrop, dateToDrop, timeToDrop, rowToDrop)
+    const appendedDraggingEvents = appendEventToEvents(notDraggingEvents, appendedEvent)
 
     return {
-      displayEvents: appendedDraggingEvent,
-      rowCount     : Math.max(getRowCount(notDraggingEvents) + 1, getRowCount(appendedDraggingEvent))
+      displayEvents: appendedDraggingEvents,
+      rowCount     : Math.max(getRowCount(notDraggingEvents) + 1, getRowCount(appendedDraggingEvents))
     }
   }, [date.date, date.events, date.id, dragState])
 
   const handleDrag = useCallback((e: MouseEvent) => {
     if (!dragState) return
 
-    const duration = dragState.event.end.getTime() - dragState.event.start.getTime()
+    const duration = dragState.event.endDateTime.getTime() - dragState.event.startDateTime.getTime()
     const durationAsMuinutes = duration / (1000 * 60)
     const maxMinutes = 24 * 60 - durationAsMuinutes
 
@@ -100,7 +96,7 @@ export default function DateRow ({
           event,
           toDrop: {
             area: date.id,
-            row : event.row,
+            row : event.displayRow,
             time: format(event.start, 'HH:mm')
           },
           ui: {
@@ -114,44 +110,15 @@ export default function DateRow ({
   }, [date.id, displayEvents, dragStart])
 
   const handleDrop = useCallback(() => {
-    const updateInputs: UpdateEventInput[] = []
-
-    const nextEventById: Record<string, CalendarEvent> = {}
-
-    const currentEventById: Record<string, CalendarEvent> = {}
-    for (const event of date.events) {
-      currentEventById[event.id] = event
-    }
-
-    for (const event of displayEvents) {
-      const id = event.id
-      const current = currentEventById[id]
-
-      const currentStart = current ? current.start.toISOString() : null
-      const currentEnd = current ? current.end.toISOString() : null
-      const currentRow = current ? current.row : null
-      const nextStart = event.start.toISOString()
-      const nextEnd = event.end.toISOString()
-      const nextRow = event.row
-
-      if (
-        currentStart === nextStart
-        && currentEnd === nextEnd
-        && currentRow === nextRow
-      ) continue
-
-      updateInputs.push({
-        id,
-        start: nextStart,
-        end  : nextEnd,
-        row  : nextRow
-      })
-
-      nextEventById[event.id] = event
-    }
-
-    bulkUpdate(updateInputs)
-  }, [bulkUpdate, date.events, displayEvents])
+    if (!dragState) return
+    const dateToDrop = date.date
+    const eventToDrop = dragState.event
+    const rowToDrop = dragState.toDrop?.row ?? null
+    const timeToDrop = dragState.toDrop?.time ?? null
+    if (rowToDrop === null || timeToDrop === null) return
+    const { id, start, end, row } = createDroppedEvent(eventToDrop, dateToDrop, timeToDrop, rowToDrop)
+    update({ id, start, end, row })
+  }, [date.date, dragState, update])
 
   const bodyWidth = minuteWidth * 60 * 24
   const height = eventHeight * rowCount

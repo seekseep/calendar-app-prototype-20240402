@@ -9,6 +9,7 @@ import { Events } from './types'
 
 export type CalendarProps = Events & {
   events: Event[]
+  isFetching?: boolean
 }
 
 export default function Calendar (props: CalendarProps) {

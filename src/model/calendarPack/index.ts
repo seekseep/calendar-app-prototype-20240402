@@ -4,27 +4,26 @@ import { v4 as uuid } from 'uuid'
 
 import { CalendarDate, CalendarEvent, Event } from '@/types'
 
-type EventsByRow <T> = Record<number, T[]>
+export type EventsByRow <T> = Record<number, T[]>
 
-export function getMinutesFromDate (date: Date): number {
+function getMinutesFromDate (date: Date): number {
   return date.getHours() * 60 + date.getMinutes()
 }
 
-export function createCalendarEvents (eventsByRow: EventsByRow<Event>) {
-  const events: CalendarEvent[] = []
-  for (const rowKey in eventsByRow) {
-    const row = Number(rowKey)
-    const rowEvents = eventsByRow[rowKey]
-    for (const event of rowEvents) {
-      events.push({
-        ...event,
-        start: new Date(event.start),
-        end  : new Date(event.end),
-        row  : row
-      })
-    }
+export function compareWithUpdatedAtAndId <T extends { updatedAt: string, id: string }> (a: T, b: T) {
+  if (a.updatedAt !== b.updatedAt) return a.updatedAt > b.updatedAt ? -1 : 1
+  return a.id.localeCompare(b.id)
+}
+
+function createIndexByStartDate <T extends { start: string }> (array: T[]): Record<string, T[]> {
+  const index: Record<string, T[]> = {}
+  for (const item of array) {
+    const key = format(item.start, 'yyyy-MM-dd')
+    const date = index[key] || []
+    date.push(item)
+    index[key] = date
   }
-  return events
+  return index
 }
 
 function isOverlapping <T extends { start: Date, end: Date } | { start: string, end: string }> (event1: T, event2: T): boolean {
@@ -36,94 +35,55 @@ function isOverlapping <T extends { start: Date, end: Date } | { start: string, 
   return true
 }
 
-export function appendEventToEventsByRow (eventsByRow: EventsByRow<Event>, toBeAppended: Event) {
+export function appendEventToEventsByRow <
+  T extends (
+    {
+      row: number
+    } & ({
+      start: Date, end: Date
+    } | {
+      start: string, end: string
+    })
+)> (
+  eventsByRow: EventsByRow<T>, toBeAppended: T
+) {
+  const next = { ...eventsByRow }
   let row = toBeAppended.row
   while (true) {
     const events = eventsByRow[row] || []
     const conflict = events.some(existed => isOverlapping(existed, toBeAppended))
     if (!conflict) {
       events.push(toBeAppended)
-      eventsByRow[row] = events
+      next[row] = events
       break
     }
     row++
   }
-  return eventsByRow
+  return next
 }
 
-function shiftEventToEventsByRow (eventsByRow: EventsByRow<CalendarEvent>, toBeShiftEvent: CalendarEvent) {
-  const conflictEvents: CalendarEvent[] = []
-  let toInsertRowEvents = [...(eventsByRow[toBeShiftEvent.row] ?? [])]
-
-  const conflictedById: Record<string, CalendarEvent> = {}
-  for (const event of toInsertRowEvents) {
-    if (!isOverlapping(event, toBeShiftEvent)) continue
-    conflictedById[event.id] = event
-    conflictEvents.push(event)
-  }
-  toInsertRowEvents = toInsertRowEvents.filter(event => !conflictedById[event.id])
-  toInsertRowEvents.push(toBeShiftEvent)
-  eventsByRow[toBeShiftEvent.row] = toInsertRowEvents
-
-  const sortedConflictEvents = conflictEvents.sort((a, b) => a.row - b.row)
-  for (const conflictEvent of sortedConflictEvents) {
-    eventsByRow = shiftEventToEventsByRow(eventsByRow, {
-      ...conflictEvent,
-      row: toBeShiftEvent.row + 1
-    })
-  }
-
-  return eventsByRow
-}
-
-function createEventsByRow <T extends { row: number }> (events: T[]): EventsByRow<T> {
-  const eventsByRow: EventsByRow<T> = {}
-  for (const event of events) {
-    const events = eventsByRow[event.row] || []
-    events.push(event)
-    eventsByRow[event.row] = events
-  }
-  return eventsByRow
-}
-
-function createEventsFromEventsByRow (eventsByRow: EventsByRow<CalendarEvent>): CalendarEvent[] {
+export function createCalendarEvents <T extends Event> (eventsByRow: EventsByRow<T>) {
   const events: CalendarEvent[] = []
   for (const rowKey in eventsByRow) {
-    const row = Number(rowKey)
-    const rowEvents = eventsByRow[rowKey]
-    for (const event of rowEvents) {
+    const displayRow = Number(rowKey)
+    const displayRowEvents = eventsByRow[displayRow]
+    for (const event of displayRowEvents) {
       events.push({
         ...event,
-        row: row
+        startDateTime: new Date(event.start),
+        endDateTime  : new Date(event.end),
+        displayRow
       })
     }
   }
   return events
 }
 
-export function shiftEventToEvents (events: CalendarEvent[], toBeShiftEvent: CalendarEvent): CalendarEvent[] {
-  const eventsByRow = createEventsByRow(events)
-  const shiftedEventsByRow = shiftEventToEventsByRow(eventsByRow, toBeShiftEvent)
-  return createEventsFromEventsByRow(shiftedEventsByRow)
-}
-
 export function createCalendarPack (events: Event[]) {
   const dates: CalendarDate[] = []
 
-  const sortedEvents = events.sort((a, b) => {
-    if (a.start !== b.start) return a.start.localeCompare(b.start)
-    if (a.start === b.start) return a.end.localeCompare(b.end)
-    return a.id.localeCompare(b.id)
-  })
-
-  const dateByEvents = sortedEvents.reduce((acc, event) => {
-    const key = format(event.start, 'yyyy-MM-dd')
-    const dateEvents = acc[key] || []
-    dateEvents.push(event)
-    acc[key] = dateEvents
-    return acc
-  }, {} as Record<string, Event[]>)
-
+  const sortedEvents = events.sort(compareWithUpdatedAtAndId)
+  const dateByEvents = createIndexByStartDate(sortedEvents)
   const sortedKeys = Object.keys(dateByEvents).sort()
 
   for (const key of sortedKeys) {

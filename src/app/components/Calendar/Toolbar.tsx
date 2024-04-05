@@ -1,8 +1,12 @@
-import { Box, Typography, Stack, Select, MenuItem } from '@mui/material'
+import { Box, Typography, Stack, Select, MenuItem, CircularProgress } from '@mui/material'
 
 import { useCalendar, useTheme } from './hooks'
 
-export default function Toolbar () {
+export default function Toolbar ({
+  isFetching
+}: {
+  isFetching?: boolean
+}) {
   const { state: { minuteUnit }, helpers: { setMinuteUnit } } = useCalendar()
   const { toolbarHeight, zIndex } = useTheme()
   return (
@@ -30,6 +34,9 @@ export default function Toolbar () {
           <MenuItem value={15}>15</MenuItem>
           <MenuItem value={20}>20</MenuItem>
         </Select>
+        {isFetching && (
+          <CircularProgress />
+        )}
       </Stack>
     </Box>
   )
