@@ -40,8 +40,8 @@ export function createDefaultEvents (): EventEntity[] {
 
   const events: EventEntity[] = []
 
-  for (let i = 0; i < 7; i++) {
-    for (let j = 0; j < 6; j++) {
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
       const date =  format(add(baseDate, { days: i }), 'yyyy-MM-dd')
       for (let k = 0; k < 2; k++) {
         const l = i * 7 + j * 2 + k
