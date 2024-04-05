@@ -17,7 +17,7 @@ export default function Calendar (props: CalendarProps) {
     <ThemeProvider>
       <Provider {...props}>
         <Container>
-          <Toolbar />
+          <Toolbar isFetching={props.isFetching} />
           <Contents />
         </Container>
       </Provider>
