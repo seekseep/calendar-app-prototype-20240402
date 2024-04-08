@@ -10,7 +10,6 @@ import { Event, UpdateEventInput } from '@/types'
 import Calendar from './Calendar'
 
 export default function ViewCalendar () {
-
   const query = useQuery({
     queryKey: ['events'],
     async queryFn () {

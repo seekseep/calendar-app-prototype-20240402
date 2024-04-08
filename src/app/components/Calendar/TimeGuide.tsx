@@ -5,12 +5,10 @@ import { Box } from '@mui/material'
 function TimeGuide ({
   zIndex,
   minuteWidth,
-  height,
   minuteUnit
 }: {
   zIndex: number
   minuteWidth: number
-  height: number
   minuteUnit: number
 }) {
   const sections = Array.from({ length: 24 * 60 / minuteUnit }, (_, i) => i)
@@ -23,6 +21,7 @@ function TimeGuide ({
       width={width}
       height="100%"
       display="flex"
+      alignItems="stretch"
       flexShrink={0}>
       {sections.map(section => (
         <Box
@@ -33,8 +32,7 @@ function TimeGuide ({
             borderRightStyle: 'solid',
             borderRightWidth: 1
           }}
-          width={minuteWidth * minuteUnit}
-          height={height} />
+          width={minuteWidth * minuteUnit} />
       ))}
     </Box>
   )
