@@ -1,6 +1,6 @@
 import { memo } from 'react'
 
-import { Card, Typography } from '@mui/material'
+import { Card, Stack, Typography } from '@mui/material'
 
 import { EventCardProps } from './types'
 
@@ -12,6 +12,7 @@ function EventCard ({
   height,
   zIndex,
   dragging,
+  description,
   ...props
 }: EventCardProps) {
   return (
@@ -29,16 +30,27 @@ function EventCard ({
         zIndex     : zIndex + (dragging ? 1 : 0),
       }}
       {...props}>
-      <Typography
-        variant="body2"
-        whiteSpace="nowrap"
-        sx={{
-          userSelect  : 'none',
-          textOverflow: 'ellipsis',
-          overflow    : 'hidden',
-        }}>
-        {label}
-      </Typography>
+      <Stack direction="row" spacing={0.5} sx={{ width: '100%' }}>
+        <Typography
+          variant="caption"
+          flexGrow={1}
+          whiteSpace="nowrap"
+          sx={{
+            userSelect  : 'none',
+            textOverflow: 'ellipsis',
+            overflow    : 'hidden',
+          }}>
+          {label}
+        </Typography>
+        {description && (
+          <Typography
+            flexShrink={0}
+            variant="caption"
+            color="text.secondary">
+            {description}
+          </Typography>
+        )}
+      </Stack>
     </Card>
   )
 }

@@ -26,25 +26,24 @@ function createIndexByStartDate <T extends { start: string }> (array: T[]): Reco
   return index
 }
 
-function isOverlapping <T extends { start: Date, end: Date } | { start: string, end: string }> (event1: T, event2: T): boolean {
-  const event1Start = getMinutesFromDate(typeof event1.start === 'string' ? new Date(event1.start) : event1.start)
-  const event1End = getMinutesFromDate(typeof event1.end === 'string' ? new Date(event1.end) : event1.end)
-  const event2Start = getMinutesFromDate(typeof event2.start === 'string' ? new Date(event2.start) : event2.start)
-  const event2End = getMinutesFromDate(typeof event2.end === 'string' ? new Date(event2.end) : event2.end)
+export function isOverlapping <
+  T1 extends { start: string, end: string },
+  T2 extends { start: string, end: string }
+> (event1: T1, event2: T2): boolean {
+  const event1Start = getMinutesFromDate(new Date(event1.start))
+  const event1End = getMinutesFromDate(new Date(event1.end))
+  const event2Start = getMinutesFromDate(new Date(event2.start))
+  const event2End = getMinutesFromDate(new Date(event2.end))
   if (event1Start >= event2End || event1End <= event2Start) return false
   return true
 }
 
 export function appendEventToEventsByRow <
-  T extends (
-    {
-      row: number
-    } & ({
-      start: Date, end: Date
-    } | {
-      start: string, end: string
-    })
-)> (
+  T extends {
+    row: number
+    start: string, end: string
+  }
+> (
   eventsByRow: EventsByRow<T>, toBeAppended: T
 ) {
   const next = { ...eventsByRow }
@@ -64,17 +63,62 @@ export function appendEventToEventsByRow <
 
 export function createCalendarEvents <T extends Event> (eventsByRow: EventsByRow<T>) {
   const events: CalendarEvent[] = []
+  const calendarEventsByRow: Record<number, CalendarEvent[]> = {}
+
+  const getNewGroupKey = (() => {
+    let count = 0
+    return function getNewGroupKey () {
+      return `g${++count}`
+    }
+  })()
+
+  const eventsByGroupKey: Record<string, CalendarEvent[]> = {}
+
   for (const rowKey in eventsByRow) {
     const displayRow = Number(rowKey)
+
+    const aboveRowEvents = calendarEventsByRow[displayRow - 1] || []
     const displayRowEvents = eventsByRow[displayRow]
+    const calendarEvents:CalendarEvent[] = []
+
     for (const event of displayRowEvents) {
-      events.push({
+      let baseRow = displayRow
+      let groupKey = getNewGroupKey()
+
+      const adjacentEventById: Record<string, CalendarEvent> = {}
+      for (const aboveEvent of aboveRowEvents) {
+        const conflict = isOverlapping(event, aboveEvent)
+        if (!conflict) continue
+        adjacentEventById[aboveEvent.id] = aboveEvent
+        for (const groupEvent of eventsByGroupKey[aboveEvent.groupKey]) {
+          adjacentEventById[groupEvent.id] = groupEvent
+        }
+
+        baseRow = aboveEvent.baseRow
+        groupKey = aboveEvent.groupKey
+      }
+      const adjacentEvents = Object.values(adjacentEventById)
+      for (const adjacentEvent of adjacentEvents) {
+        if (adjacentEvent.groupKey === groupKey) continue
+        delete eventsByGroupKey[adjacentEvent.groupKey]
+        adjacentEvent.groupKey = groupKey
+      }
+
+      const calendarEvent: CalendarEvent = {
         ...event,
         startDateTime: new Date(event.start),
         endDateTime  : new Date(event.end),
-        displayRow
-      })
+        displayRow,
+        baseRow,
+        groupKey
+      }
+
+      eventsByGroupKey[groupKey] = eventsByGroupKey[groupKey] ?? []
+      eventsByGroupKey[groupKey].push(calendarEvent)
+      calendarEvents.push(calendarEvent)
     }
+    calendarEventsByRow[displayRow] = calendarEvents
+    events.push(...calendarEvents)
   }
   return events
 }

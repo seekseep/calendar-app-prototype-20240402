@@ -4,6 +4,7 @@ import { CardProps } from '@mui/material'
 
 export interface EventCardProps extends CardProps {
   label: ReactNode
+  description?: ReactNode
   left: number
   top: number
   width: number

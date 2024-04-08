@@ -18,7 +18,9 @@ export function createEventCardProps (event: CalendarEvent, {
   const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60)
 
   const row = event.displayRow
-  const label = `${event.label} (${event.row})`
+
+  const label = `${event.label}`
+  const description = `#${event.id},${event.groupKey},${event.baseRow}`
   const top = row * eventHeight
   const left = startMinutes * minuteWidth - offsetMinutes
   const width = durationMinutes * minuteWidth
@@ -29,6 +31,7 @@ export function createEventCardProps (event: CalendarEvent, {
     left,
     width,
     height,
-    zIndex
+    zIndex,
+    description,
   }
 }

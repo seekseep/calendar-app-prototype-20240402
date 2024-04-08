@@ -23,20 +23,19 @@ export default function DateRow ({
   const {
     minuteWidth,
     eventHeight,
-    rowFootWidth,
     zIndex,
   } = useTheme()
   const {
     state: {
       drag: dragState,
-      minuteUnit,
+      minuteUnit
     }
   } = useCalendar()
 
   const { displayEvents, rowCount } = useDisplayCalendarDate(date)
   const handleDrag = useHandleDrag(date)
   const dragStartHandlerById = useDragStartHandlerById(date, displayEvents)
-  const handleDrop = useHandleDrop(date)
+  const handleDrop = useHandleDrop(date, displayEvents)
 
   return (
     <DateRowContainer>

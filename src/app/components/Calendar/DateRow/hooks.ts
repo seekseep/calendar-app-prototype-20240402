@@ -1,11 +1,11 @@
 import { format } from 'date-fns'
 import { useCallback, MouseEvent, useMemo } from 'react'
 
-import { CalendarDate, CalendarEvent } from '@/types'
+import { CalendarDate, CalendarEvent, UpdateEventInput } from '@/types'
 
 import { useCalendar, useTheme } from '../hooks'
 
-import { appendEventToEvents, createDroppedEvent, getRowCount } from './utilities'
+import { appendEventToEvents, createDroppedEvent, getRowCount, removeEventFromEvents } from './utilities'
 
 export function useDisplayCalendarDate (date: CalendarDate) {
   const {
@@ -16,7 +16,9 @@ export function useDisplayCalendarDate (date: CalendarDate) {
 
   return useMemo(() => {
     const dragging = !!dragState
-    if (!dragging) {
+    const rowToDrop = dragState?.toDrop?.row ?? null
+    const timeToDrop = dragState?.toDrop?.time ?? null
+    if (!dragging || rowToDrop === null || timeToDrop === null) {
       return {
         displayEvents: date.events,
         rowCount     : getRowCount(date.events)
@@ -25,10 +27,9 @@ export function useDisplayCalendarDate (date: CalendarDate) {
 
     const toBeDrop = dragState?.toDrop?.area === date.id
     const eventToDrop = dragState.event
-    const rowToDrop = dragState.toDrop?.row ?? null
-    const timeToDrop = dragState.toDrop?.time ?? null
-    const notDraggingEvents = date.events.filter(event => event.id !== dragState.event.id)
-    if (!toBeDrop || rowToDrop === null || timeToDrop === null) {
+
+    const notDraggingEvents = removeEventFromEvents(date.events, eventToDrop)
+    if (!toBeDrop) {
       return {
         displayEvents: notDraggingEvents,
         rowCount     : getRowCount(notDraggingEvents)
@@ -83,26 +84,56 @@ export function useHandleDrag (date: CalendarDate) {
   }, [date.id, drag, dragState, eventHeight, minuteUnit, minuteWidth])
 }
 
-export function useHandleDrop (date: CalendarDate) {
+export function useHandleDrop (date: CalendarDate, displayEvents: CalendarEvent[]) {
   const {
     state: {
       drag: dragState,
     },
     helpers: {
-      update,
+      bulkUpdate
     }
   } = useCalendar()
 
   return useCallback(() => {
     if (!dragState) return
-    const dateToDrop = date.date
-    const eventToDrop = dragState.event
     const rowToDrop = dragState.toDrop?.row ?? null
     const timeToDrop = dragState.toDrop?.time ?? null
     if (rowToDrop === null || timeToDrop === null) return
-    const { id, start, end, row } = createDroppedEvent(eventToDrop, dateToDrop, timeToDrop, rowToDrop)
-    update({ id, start, end, row })
-  }, [date.date, dragState, update])
+
+    const inputs: UpdateEventInput[] = []
+
+    const currentEventById: Record<string, CalendarEvent> = {}
+    for (const currentEvent of date.events) currentEventById[currentEvent.id] = currentEvent
+
+    for (const nextEvent of displayEvents) {
+      const id = nextEvent.id
+
+      const currentEvent = currentEventById[id]
+      const currentStart = currentEvent?.start
+      const currentEnd = currentEvent?.end
+      const currentRow = currentEvent?.displayRow
+
+      const {
+        start: nextStart,
+        end: nextEnd,
+        displayRow: nextRow
+      } = nextEvent
+      if (
+        currentStart === nextStart
+        && currentEnd === nextEnd
+        && currentRow === nextRow
+      ) continue
+
+      inputs.push({
+        id,
+        start: nextStart,
+        end  : nextEnd,
+        row  : nextRow
+      })
+    }
+
+    bulkUpdate(inputs)
+  }, [bulkUpdate, date.events, displayEvents, dragState])
 }
 
 export function useDragStartHandlerById (
@@ -119,6 +150,11 @@ export function useDragStartHandlerById (
     const dragStartHandlerById: Record<string, (event: MouseEvent) => any> = {}
     for (const event of displayEvents) {
       dragStartHandlerById[event.id] = function (e: MouseEvent) {
+        const card = e.currentTarget
+        const rect = card.getBoundingClientRect()
+        const offsetX = e.clientX - rect.left
+        const offsetY = e.clientY - rect.top
+
         dragStart({
           event,
           toDrop: {
@@ -127,8 +163,8 @@ export function useDragStartHandlerById (
             time: format(event.start, 'HH:mm')
           },
           ui: {
-            offsetX: e.nativeEvent.offsetX,
-            offsetY: e.nativeEvent.offsetY
+            offsetX,
+            offsetY,
           }
         })
       }

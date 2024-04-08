@@ -9,7 +9,7 @@ export function initializer (events: Event[]): State {
   return {
     minuteUnit: 15,
     pack      : createCalendarPack(events),
-    drag      : null
+    drag      : null,
   }
 }
 

@@ -1,4 +1,4 @@
-import { ContextValue, Helpers, Refs, State, ThemeContextValue } from './types'
+import { ContextValue, Helpers, State, ThemeContextValue } from './types'
 
 export const defaultState: State = {
   minuteUnit: 15,
@@ -7,10 +7,6 @@ export const defaultState: State = {
     createdAt: ''
   },
   drag: null
-}
-
-const defaultRefs: Refs = {
-
 }
 
 export const defaultHelpers: Helpers = {
@@ -25,7 +21,6 @@ export const defaultHelpers: Helpers = {
 export const defaultContextValue: ContextValue = {
   helpers: defaultHelpers,
   state  : defaultState,
-  refs   : defaultRefs
 }
 
 export const defaultThemeContextValue: ThemeContextValue = {

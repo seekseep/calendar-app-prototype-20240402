@@ -4,7 +4,8 @@ import {
   EventsByRow,
   appendEventToEventsByRow,
   compareWithUpdatedAtAndId,
-  createCalendarEvents
+  createCalendarEvents,
+  isOverlapping
 } from '@/model/calendarPack'
 import { CalendarEvent } from '@/types'
 
@@ -34,6 +35,64 @@ export function createDroppedEvent (baseEvent: CalendarEvent, date: Date, time: 
   return newEvent
 }
 
+export function removeEventFromEvents (
+  currentEvents: CalendarEvent[],
+  removeEvent:  CalendarEvent,
+) {
+  const groupKey = removeEvent.groupKey
+  const groupEvents: CalendarEvent[] = []
+  const nextEvents: CalendarEvent[] = []
+  const nextEventsByDisplayRow: EventsByRow<CalendarEvent> = {}
+  for (const event of currentEvents) {
+    if (event.id === removeEvent.id) continue
+    if (event.groupKey === groupKey) {
+      groupEvents.push(event)
+      continue
+    }
+
+    nextEventsByDisplayRow[event.displayRow] = nextEventsByDisplayRow[event.displayRow] || []
+
+    nextEvents.push(event)
+    nextEventsByDisplayRow[event.displayRow].push(event)
+  }
+
+  const sortedGroupEvents = groupEvents.sort((a, b) => {
+    if (a.displayRow != b.displayRow) return a.displayRow - b.displayRow
+    return compareWithUpdatedAtAndId(a, b)
+  })
+
+  for (const event of sortedGroupEvents) {
+    if (event.displayRow === event.baseRow) {
+      nextEvents.push(event)
+      nextEventsByDisplayRow[event.displayRow] = nextEventsByDisplayRow[event.displayRow] || []
+      nextEventsByDisplayRow[event.displayRow].push(event)
+      continue
+    }
+
+    let displayRow = event.baseRow
+    while (true) {
+      const events = nextEventsByDisplayRow[displayRow] || []
+
+      const conflict = events.some(existed => isOverlapping(event, existed))
+
+      if (!conflict) {
+        nextEvents.push({
+          ...event,
+          row: displayRow,
+          displayRow,
+        })
+        nextEventsByDisplayRow[displayRow] = nextEventsByDisplayRow[displayRow] || []
+        nextEventsByDisplayRow[displayRow].push(event)
+        break
+      }
+
+      displayRow++
+    }
+  }
+
+  return nextEvents
+}
+
 export function appendEventToEvents(
   currentEvents: CalendarEvent[],
   appendedEvent: CalendarEvent,
@@ -42,6 +101,6 @@ export function appendEventToEvents(
   const sorted = events.sort(compareWithUpdatedAtAndId)
   let eventsByRow: EventsByRow<CalendarEvent> = {}
   for (const event of sorted) eventsByRow = appendEventToEventsByRow(eventsByRow, event)
-  const appendedEvents = createCalendarEvents(eventsByRow)
-  return appendedEvents
+  const nextEvents = createCalendarEvents(eventsByRow)
+  return nextEvents
 }

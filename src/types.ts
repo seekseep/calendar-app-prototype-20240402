@@ -16,6 +16,8 @@ export interface CalendarEvent extends Event {
   startDateTime: Date
   endDateTime: Date
   displayRow: number
+  groupKey: string
+  baseRow: number
 }
 
 export interface CalendarDate {

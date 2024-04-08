@@ -1,5 +1,3 @@
-import { RefObject } from 'react'
-
 import { CalendarPack as Pack, CalendarEvent, UpdateEventInput } from '@/types'
 
 type DropArea = string
@@ -65,14 +63,9 @@ export interface Helpers {
   setMinuteUnit: (minuteUnit: number) => any
 }
 
-export interface Refs {
-  inner?: RefObject<HTMLDivElement>
-}
-
 export interface ContextValue {
   state: State
   helpers: Helpers
-  refs: Refs
 }
 
 export interface ThemeContextValue {

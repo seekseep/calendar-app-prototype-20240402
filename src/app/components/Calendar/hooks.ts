@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from 'react'
+import { createContext, useContext, useEffect, useMemo, useReducer } from 'react'
 
 import { createCalendarPack } from '@/model/calendarPack'
 import { Event } from '@/types'
@@ -17,7 +17,6 @@ export function useContextValue ({
   onUpdate,
   onBulkUpdate
 }: Events & { events: Event[] }): ContextValue {
-  const innerRef = useRef<HTMLDivElement>(null)
   const [state, dispatch]  = useReducer(reducer, events, initializer)
 
   const helpers = useMemo((): Helpers => {
@@ -51,10 +50,7 @@ export function useContextValue ({
 
   return {
     state,
-    helpers,
-    refs: {
-      inner: innerRef
-    }
+    helpers
   }
 }
 
