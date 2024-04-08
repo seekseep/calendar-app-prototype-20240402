@@ -97,8 +97,11 @@ export function appendEventToEvents(
   currentEvents: CalendarEvent[],
   appendedEvent: CalendarEvent,
 ) {
-  const events = [...currentEvents, appendedEvent]
-  const sorted = events.sort(compareWithUpdatedAtAndId)
+  const sortedCurrentEvents = currentEvents.sort((a, b) => {
+    if (a.displayRow != b.displayRow) return a.displayRow - b.displayRow
+    return compareWithUpdatedAtAndId(a, b)
+  })
+  const sorted = [appendedEvent, ...sortedCurrentEvents]
   let eventsByRow: EventsByRow<CalendarEvent> = {}
   for (const event of sorted) eventsByRow = appendEventToEventsByRow(eventsByRow, event)
   const nextEvents = createCalendarEvents(eventsByRow)
